@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <div id="root"></div>
+    <div id="DOM"></div>
     <script type="text/babel">
 
         const title = movies.title;
@@ -23,16 +23,16 @@
             console.log('props= ', props);
             return
             <span>
-                <h1>Miho's Spring 2022 IT122 Page</h1>
+                <h1>My movies</h1>
                 <h2>Movies</h2>
                 <NameList movies={title} />
             </span>;
         }
 
-        const container = document.getElementById('root'); //idが必要
-        const root = ReactDOM.createRoot(container);
-        // root.render(<MyApp />);
-        root.render(<Greeting/>);
+        const container = document.getElementById('DOM'); 
+        const DOM = ReactDOM.createDOM(container);
+        
+        DOM.render(<Greeting/>);
 
     </script>
 </body>
