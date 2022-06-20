@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <title>Kazuya Goto</title>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+
+        const name = movies.name;
+        const NameList  = (props) => {
+            console.log('NameList props=', props);
+            return props.movies.map((title) =>  <li key={title}>{title}</li>);
+        }
+
+        const Greeting = (props) => {
+            console.log('props= ', props);
+            return
+            <span>
+                <h1>My movies</h1>
+                <NameList movies={title} />
+            </span>;
+        }
+
+        const container = document.getElementById('root'); 
+        const root = ReactDOM.createRoot(container);
+        // root.render(<MyApp />);
+        root.render(<Greeting/>);
+
+    </script>
+</body>
+
+<script src="../index2.js"></script>
+<script src="../data.js"></script>
+
+</html> 
