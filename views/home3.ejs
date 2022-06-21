@@ -1,0 +1,128 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+        <title>Kazuya Goto</title>
+        <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+
+        <!-- Don't use this in production: -->
+        <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+        <link rel="stylesheet" href="../public/style.css">
+    </head>
+
+    <body>
+        <div id="root"></div>
+        <script type="text/babel">
+            const Items = (props) => {
+                console.log(props);
+                const listItems = props.data.map((item) => {
+                    return <li key={item._id} id={item._id} onClick={props.clickHandler}>
+                        {item.name}
+                    </li>
+                });
+                return <div className="container"><ul>{listItems}</ul></div>
+            }
+            const ItemDetail = (props) => {
+                return <div>Detail<hr/>
+                    <form>
+                        Name: <input type="text" name="name" onChange={props.onChange} value={props.item.name || ""} /><br/>
+                        Year: <input type="text" name="year" onChange={props.onChange} value={props.item.year || ""} /><br/>
+                        Director: <input type="text" name="name" onChange={props.onChange} value={props.item.director || ""} /><br/>
+                        Genre: <input type="text" name="name" onChange={props.onChange} value={props.item.genre || ""} />
+                    </form>
+                    <button name="clear" onClick={props.clearField}>Clear</button>&nbsp;
+                    <button name="save" onClick={props.saveItem}>Save</button>&nbsp;
+                    <button name="delete" onClick={props.deleteItem}>Delete</button>
+                </div>
+            }
+
+            class App extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state = {
+                items: "<%- movies %>",
+                currentItem: {}
+            };
+        }
+        showDetail = (event) => {
+            // console.log(event.target);
+            // console.log(event.target.innerText);
+            // console.log(event.target.id);
+            let name = event.target.innerText;
+            let newItem = this.state.items.find((item) => item.name == name);
+            this.setState({"currentItem": newItem})
+        }
+        fieldChanged = (event) => {
+            let newItem = this.state.currentItem;
+            console.log(event.target.value);
+            newItem[event.target.name] = event.target.value;
+            this.setState({currentItem: newItem})
+        }
+
+        saveItem = () => {
+            console.log(this.state.currentItem);
+            if (this.state.currentItem == {}) return
+            let newItem = this.state.currentItem;   
+            fetch("/api/movies/add", {
+                method: "POST",
+                headers: {'Content-type': 'application/json'},
+                body: JSON.stringify(newItem)
+            })
+                .then(res => res.json())
+                .then((json) => {
+                    console.log(json)
+                    // if this is a new item, add to list of items
+                    if (json.updated.upsertedCount > 0) {
+                        newItem._id = json._id
+                        let newList = this.state.items;
+                        newList.push(newItem);
+                        this.setState({items: newList});
+                    }
+                });
+        }
+
+        deleteItem = () => {
+            console.log(this.state.currentItem);
+            if (this.state.currentItem == {}) return
+            let deleteTitle = this.state.currentItem.title
+            let url = "/api/movies/delete/"+ deleteTitle;
+            
+            fetch(url)
+                .then(res => res.json())
+                .then((json) => {
+                    console.log(json)
+                    if (json.deleted.deletedCount > 0) {
+                        let newList = this.state.items.filter(item => {
+                            return item.title != deleteTitle;
+                        })
+                        this.setState({items: newList, currentItem: {}})
+                    } 
+                })
+        }
+
+        
+
+        render() {
+            return (
+                <div>
+                    <h2>Inventory</h2>
+                    <Items data={this.state.items} clickHandler={this.showDetail} />
+                    <ItemDetail
+                        item={this.state.currentItem}
+                        onChange = {this.fieldChanged}
+                    />
+                </div>
+            );
+        }
+    }
+
+
+            ReactDOM.render(
+                // <App />, document.getElementById('root')
+                <div><Movies  data={movies} clickHandler={showDetail} /></div>,
+                document.getElementById('root')
+            );
+        </script>
+    </body>
+</html>
